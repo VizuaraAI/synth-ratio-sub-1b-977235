@@ -1,0 +1,30 @@
+# Core training stack
+torch>=2.5.0
+transformers>=4.46.0
+datasets>=3.1.0
+tokenizers>=0.20.0
+accelerate>=1.1.0
+safetensors>=0.4.5
+
+# Data handling
+numpy>=1.26.0
+pyyaml>=6.0.2
+zstandard>=0.23.0
+tqdm>=4.66.0
+huggingface-hub>=0.26.0
+
+# Analysis and figures
+scipy>=1.14.0
+pandas>=2.2.0
+matplotlib>=3.9.0
+
+# Downstream zero-shot evaluation (ARC-E, HellaSwag, PIQA, SciQ, LAMBADA)
+lm-eval>=0.4.5
+
+# Optional: run tracking. Comment out if you do not want an account.
+wandb>=0.18.0
+
+# Optional: much faster synthetic-data generation if you have a GPU with
+# enough memory for a 7B-8B instruct generator. Install separately, it is
+# a heavy dependency:
+#   pip install vllm>=0.6.3

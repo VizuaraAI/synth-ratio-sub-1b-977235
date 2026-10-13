@@ -1,0 +1,61 @@
+# Default configuration for one pretraining run.
+#
+# One run = one (model size, synthetic share alpha) pair. Everything else in
+# this file is held FIXED across the whole sweep. That invariance is the
+# experiment: if you change the learning rate between alpha values you can no
+# longer attribute a loss difference to the data mixture.
+
+run:
+  name: null              # auto-filled as "{size}_alpha{alpha}_seed{seed}" if null
+  out_dir: runs
+  seed: 0
+  log_every: 50
+  eval_every: 500
+  save_final_checkpoint: true
+  wandb_project: null     # set to a string to enable wandb logging
+
+# ---------------------------------------------------------------------------
+# The manipulated variable. Sweep this.
+# ---------------------------------------------------------------------------
+mixture:
+  alpha: 0.05             # synthetic fraction of the training token stream
+  synthetic_style: balanced   # rephrase | textbook | qa | balanced
+  # "balanced" draws equally from the three style pools, which is the
+  # headline configuration. The single-style values are for the ablation.
+
+# ---------------------------------------------------------------------------
+# Model. Pick one of the four sizes defined in src/model.py.
+# ---------------------------------------------------------------------------
+model:
+  size: 160m              # 70m | 160m | 410m | 830m
+  tokenizer: HuggingFaceTB/SmolLM2-135M
+  max_seq_len: 1024
+
+# ---------------------------------------------------------------------------
+# Data. Token budgets follow a fixed tokens-per-parameter rule (20x, the
+# Chinchilla-compute-optimal ratio) so that every size is trained in the
+# same compute regime. Keep the rule, not the absolute number, constant.
+# ---------------------------------------------------------------------------
+data:
+  cache_dir: data
+  real_dataset: HuggingFaceFW/fineweb-edu
+  real_subset: sample-10BT
+  synthetic_dir: data/synthetic      # written by src/synthesize.py
+  val_tokens: 2_000_000              # held-out REAL web tokens only
+  tokens_per_param: 20
+
+# ---------------------------------------------------------------------------
+# Optimization. Fixed for all runs.
+# ---------------------------------------------------------------------------
+optim:
+  micro_batch_size: 16
+  grad_accum_steps: 8                # effective batch 128 sequences
+  lr: 0.0006
+  min_lr_ratio: 0.1
+  warmup_ratio: 0.01
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  grad_clip: 1.0
+  dtype: bfloat16
+  compile: false
